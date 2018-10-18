@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentSearchEngine", "DocumentSearchEngine\DocumentSearchEngine.csproj", "{F14655E4-F63F-413D-B1FE-AA0F4E9A406B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentSearchEngine", "DocumentSearchEngine\DocumentSearchEngine.csproj", "{F14655E4-F63F-413D-B1FE-AA0F4E9A406B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleInterface", "ConsoleInterface\ConsoleInterface.csproj", "{6AE8A7F6-69D6-4237-B002-371CF21B51A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{F14655E4-F63F-413D-B1FE-AA0F4E9A406B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F14655E4-F63F-413D-B1FE-AA0F4E9A406B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F14655E4-F63F-413D-B1FE-AA0F4E9A406B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AE8A7F6-69D6-4237-B002-371CF21B51A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AE8A7F6-69D6-4237-B002-371CF21B51A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AE8A7F6-69D6-4237-B002-371CF21B51A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AE8A7F6-69D6-4237-B002-371CF21B51A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
