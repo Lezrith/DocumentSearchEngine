@@ -16,8 +16,12 @@ namespace DocumentSearchEngine
                 .GroupBy(w => w)
                 .Select(g => (g.Key, g.Count()))
                 .ToList();
-            int max = frequencies.Max(f => f.count);
-            Dictionary<string, double> normalized = frequencies.ToDictionary(f => f.key, f => f.count > 0 ? f.count / (double)max : 0);
+            Dictionary<string, double> normalized = new Dictionary<string, double>();
+            if (frequencies.Count > 0)
+            {
+                int max = frequencies.Max(f => f.count);
+                normalized = frequencies.ToDictionary(f => f.key, f => f.count > 0 ? f.count / (double)max : 0);
+            }
             return normalized;
         }
 
@@ -29,8 +33,10 @@ namespace DocumentSearchEngine
             int numberOfDocuments = termFrequencies.Count;
             foreach (var keyword in keywords)
             {
-                var occurences = termFrequencies.Where(tf => tf.ContainsKey(keyword));
-                double idf = Math.Log10(occurences.Count() / numberOfDocuments);
+                var numberOfOccurences = termFrequencies.Count(tf => tf.ContainsKey(keyword));
+                double idf = numberOfOccurences > 0
+                    ? Math.Log10((double)numberOfDocuments / numberOfOccurences)
+                    : 0;
                 result.Add(keyword, idf);
             }
             return result;

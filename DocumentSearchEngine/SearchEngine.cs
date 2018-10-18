@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DocumentSearchEngine
@@ -7,7 +8,7 @@ namespace DocumentSearchEngine
     {
         private readonly List<Document> documents;
         private readonly IDictionary<Document, IReadOnlyCollection<double>> documentVectors;
-        private readonly List<string> keywords;
+        private readonly HashSet<string> keywords;
         private readonly DocumentSanitizer sanitizer;
         private readonly PorterStemmer stemmer;
         private IReadOnlyDictionary<string, double> inverseDocumentFrequencies;
@@ -17,7 +18,7 @@ namespace DocumentSearchEngine
             this.sanitizer = new DocumentSanitizer();
             this.stemmer = new PorterStemmer();
             this.documents = new List<Document>();
-            this.keywords = new List<string>();
+            this.keywords = new HashSet<string>();
             this.inverseDocumentFrequencies = new Dictionary<string, double>();
             this.documentVectors = new Dictionary<Document, IReadOnlyCollection<double>>();
         }
@@ -49,6 +50,10 @@ namespace DocumentSearchEngine
         {
             var preparedQuery = this.sanitizer.PrepareDocument(query);
             var tf = TermFrequencyCalculator.CalculateTermFrequency(preparedQuery, this.keywords);
+            if (tf.Count == 0)
+            {
+                throw new ArgumentException("Query does not contain any known keywords");
+            }
             var queryVector = this.ToVector(tf);
             return this.documents.Select(d =>
                 {
@@ -61,10 +66,7 @@ namespace DocumentSearchEngine
 
         private IEnumerable<double> ToVector(IReadOnlyDictionary<string, double> termFrequencies)
         {
-            return from termFrequency in termFrequencies
-                   join inverseTermFrequency in this.inverseDocumentFrequencies
-                   on termFrequency.Key equals inverseTermFrequency.Key
-                   select termFrequency.Value * inverseTermFrequency.Value;
+            return this.inverseDocumentFrequencies.Select(idf => termFrequencies.GetValueOrDefault(idf.Key));
         }
     }
 }
