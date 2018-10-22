@@ -66,7 +66,7 @@ namespace DocumentSearchEngine
 
         private IEnumerable<double> ToVector(IReadOnlyDictionary<string, double> termFrequencies)
         {
-            return this.inverseDocumentFrequencies.Select(idf => termFrequencies.GetValueOrDefault(idf.Key));
+            return this.inverseDocumentFrequencies.Select(idf => termFrequencies.GetValueOrDefault(idf.Key) * idf.Value);
         }
     }
 }

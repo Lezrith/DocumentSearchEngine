@@ -20,14 +20,13 @@ namespace DocumentSearchEngine
         /// <summary>
         /// Removes any character from string except letters, digits and white spaces.
         /// </summary>
-        /// <remarks>
-        /// https://stackoverflow.com/questions/1120198/most-efficient-way-to-remove-special-characters-from-string
-        /// </remarks>
+        /// <remarks>https://stackoverflow.com/questions/1120198/most-efficient-way-to-remove-special-characters-from-string</remarks>
         /// <param name="contents"></param>
         /// <returns></returns>
         private string RemoveSpecialCharacters(string contents)
         {
             var sb = new StringBuilder();
+            contents = contents.Replace("\r", "").Replace("\n", " ");
             foreach (char c in contents)
             {
                 if (Char.IsLetterOrDigit(c) || Char.IsWhiteSpace(c))
@@ -36,7 +35,7 @@ namespace DocumentSearchEngine
                 }
             }
 
-            var singleSpaces = Regex.Replace(sb.ToString(), @"\s{2,}", "");
+            var singleSpaces = Regex.Replace(sb.ToString(), @"\s{2,}", " ");
             return singleSpaces;
         }
     }

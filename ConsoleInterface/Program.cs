@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ConsoleInterface
 {
@@ -11,7 +12,7 @@ namespace ConsoleInterface
         {
             if (args.Length < 2)
             {
-                Console.WriteLine("Provide two arguments: <documents_database> <keywords_list>");
+                Console.WriteLine("Provide at least two arguments: <documents_database> <keywords_list> <n_results(optional)>");
                 return;
             }
             var documentDbPath = args[0];
@@ -26,13 +27,13 @@ namespace ConsoleInterface
                 Console.Write($"Keywords list does not exist: {keywordsPath}");
                 return;
             }
-            if (args.Length > 2 && !Int32.TryParse(args[2], out int max))
+            if (args.Length == 2 || !Int32.TryParse(args[2], out int max))
             {
                 max = 10;
             }
 
             var searchEngine = new SearchEngine();
-            foreach (var rawDocument in File.ReadAllText(documentDbPath).Split($"{Environment.NewLine}{Environment.NewLine}"))
+            foreach (var rawDocument in File.ReadAllText(documentDbPath).Replace("\r", "").Split("\n\n"))
             {
                 var sanitizer = new DocumentSanitizer();
                 var document = sanitizer.PrepareDocument(rawDocument);
@@ -50,7 +51,7 @@ namespace ConsoleInterface
                 var query = Console.ReadLine();
                 try
                 {
-                    var results = searchEngine.Search(query).Take(10).Where(x => x.similarity > 0).ToList();
+                    var results = searchEngine.Search(query).Take(max).Where(x => x.similarity > 0).ToList();
                     if (results.Count == 0)
                     {
                         Console.WriteLine("No documents retrieved for your query :(");
