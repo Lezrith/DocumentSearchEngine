@@ -32,26 +32,20 @@ namespace ConsoleInterface
                 max = 10;
             }
 
-            var searchEngine = new SearchEngine();
+            var keywords = File.ReadAllLines(keywordsPath);
+
+            var searchEngine = new SearchEngine(keywords, new DocumentSanitizer());
             foreach (var rawDocument in File.ReadAllText(documentDbPath).Replace("\r", "").Split("\n\n"))
             {
-                var sanitizer = new DocumentSanitizer();
-                var document = sanitizer.PrepareDocument(rawDocument);
-                searchEngine.AddDocument(document);
+                searchEngine.AddDocument(rawDocument);
             }
-
-            foreach (var keyword in File.ReadAllLines(keywordsPath))
-            {
-                searchEngine.AddKeyword(keyword);
-            }
-            searchEngine.RecalculateTermFrequency();
             while (true)
             {
                 Console.WriteLine("What are you looking for?");
                 var query = Console.ReadLine();
                 try
                 {
-                    var results = searchEngine.Search(query).Take(max).Where(x => x.similarity > 0).ToList();
+                    var results = searchEngine.Search(query).Results.Take(max).Where(x => x.similarity > 0).ToList();
                     if (results.Count == 0)
                     {
                         Console.WriteLine("No documents retrieved for your query :(");

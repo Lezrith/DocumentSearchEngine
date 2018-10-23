@@ -11,19 +11,19 @@ namespace DocumentSearchEngine
             return Math.Sqrt(xs.Sum(x => x * x));
         }
 
-        public static double CrossProduct(this IEnumerable<double> xs, IEnumerable<double> ys)
-        {
-            return xs.Magnitude() * ys.Magnitude();
-        }
-
         public static double DotProduct(this IEnumerable<double> xs, IEnumerable<double> ys)
         {
-            return xs.Zip(ys, (x, y) => x * y).Sum();
+            return xs.Times(ys).Sum();
         }
 
         public static double Cosine(this IEnumerable<double> xs, IEnumerable<double> ys)
         {
-            return xs.DotProduct(ys) / xs.CrossProduct(ys);
+            return xs.DotProduct(ys) / (xs.Magnitude() * ys.Magnitude());
+        }
+
+        public static IEnumerable<double> Times(this IEnumerable<double> xs, IEnumerable<double> ys)
+        {
+            return xs.Zip(ys, (x, y) => x * y);
         }
     }
 }

@@ -1,20 +1,31 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DocumentSearchEngine
 {
-    public class DocumentSanitizer
+    public class DocumentSanitizer : IDocumentSanitizer
     {
-        public Document PrepareDocument(string contents)
+        public Document PrepareDocument(string contents, IReadOnlyCollection<string> keywords)
         {
             var cleaned = RemoveSpecialCharacters(contents);
             var lower = cleaned.ToLower();
             var splitted = lower.Split();
             var stemmer = new PorterStemmer();
             var stemmed = splitted.Select(stemmer.StemWord).ToArray();
-            return new Document(contents, stemmed);
+            var vector = this.DocumentToVector(stemmed, keywords);
+            return new Document(contents, stemmed, vector);
+        }
+
+        private double[] DocumentToVector(IReadOnlyCollection<string> contents, IReadOnlyCollection<string> keywords)
+        {
+            var vector = keywords.Select(k => contents.Count(c => c.Equals(k)));
+            var max = vector.Max();
+            double[] normalized = max > 0 ? vector.Select(x => x / (double)max).ToArray() : new double[keywords.Count];
+            return normalized;
         }
 
         /// <summary>

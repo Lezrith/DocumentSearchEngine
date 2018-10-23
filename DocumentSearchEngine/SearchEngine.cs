@@ -7,66 +7,67 @@ namespace DocumentSearchEngine
     public class SearchEngine
     {
         private readonly List<Document> documents;
-        private readonly IDictionary<Document, IReadOnlyCollection<double>> documentVectors;
         private readonly HashSet<string> keywords;
-        private readonly DocumentSanitizer sanitizer;
+        private readonly IDocumentSanitizer sanitizer;
         private readonly PorterStemmer stemmer;
-        private IReadOnlyDictionary<string, double> inverseDocumentFrequencies;
+        private readonly ICollection<double> inverseDocumentFrequencies;
 
-        public SearchEngine()
+        public SearchEngine(string[] keywords, IDocumentSanitizer sanitizer)
         {
-            this.sanitizer = new DocumentSanitizer();
+            this.sanitizer = sanitizer;
             this.stemmer = new PorterStemmer();
             this.documents = new List<Document>();
             this.keywords = new HashSet<string>();
-            this.inverseDocumentFrequencies = new Dictionary<string, double>();
-            this.documentVectors = new Dictionary<Document, IReadOnlyCollection<double>>();
-        }
-
-        public void AddDocument(Document document) => this.documents.Add(document);
-
-        public void AddKeyword(string keyword) => this.keywords.Add(this.stemmer.StemWord(keyword));
-
-        public void RecalculateTermFrequency()
-        {
-            this.documentVectors.Clear();
-            var termFrequencyMap = new List<(Document document, IReadOnlyDictionary<string, double> termFrequencies)>();
-            foreach (var document in this.documents)
+            this.inverseDocumentFrequencies = new List<double>();
+            foreach (var keyword in keywords)
             {
-                var tf = TermFrequencyCalculator.CalculateTermFrequency(document, this.keywords);
-                termFrequencyMap.Add((document, tf));
-            }
-            this.inverseDocumentFrequencies = TermFrequencyCalculator.CalculateInverseTermFrequency(
-                this.keywords,
-                termFrequencyMap.Select(dtf => dtf.termFrequencies).ToList());
-            foreach (var (document, termFrequencies) in termFrequencyMap)
-            {
-                IEnumerable<double> documentVector = ToVector(termFrequencies);
-                this.documentVectors.Add(document, documentVector.ToList());
+                var stemmed = this.stemmer.StemWord(keyword);
+                this.keywords.Add(stemmed);
             }
         }
 
-        public IEnumerable<(Document document, double similarity)> Search(string query)
+        public void AddDocument(string rawContent)
         {
-            var preparedQuery = this.sanitizer.PrepareDocument(query);
-            var tf = TermFrequencyCalculator.CalculateTermFrequency(preparedQuery, this.keywords);
-            if (tf.Count == 0)
+            var document = this.sanitizer.PrepareDocument(rawContent, this.keywords);
+            this.documents.Add(document);
+            this.RecalculateInverseTermFrequency();
+        }
+
+        private void RecalculateInverseTermFrequency()
+        {
+            this.inverseDocumentFrequencies.Clear();
+            double[][] vectors = this.documents.Select(d => d.Vector.ToArray()).ToArray();
+            for (int i = 0; i < this.keywords.Count; i++)
+            {
+                int numberOfOccurences = 0;
+                for (int j = 0; j < vectors.Length; j++)
+                {
+                    if (vectors[j][i] > 0)
+                    {
+                        numberOfOccurences++;
+                    }
+                }
+                var idf = numberOfOccurences > 0 ? Math.Log10(this.documents.Count / (double)numberOfOccurences) : 0;
+                this.inverseDocumentFrequencies.Add(idf);
+            }
+        }
+
+        public SearchResult Search(string query)
+        {
+            var preparedQuery = this.sanitizer.PrepareDocument(query, this.keywords);
+            if (preparedQuery.Length == 0)
             {
                 throw new ArgumentException("Query does not contain any known keywords");
             }
-            var queryVector = this.ToVector(tf);
-            return this.documents.Select(d =>
+            var queryVector = preparedQuery.Vector.Times(this.inverseDocumentFrequencies);
+            var results = this.documents.Select(d =>
                 {
-                    var documentVector = this.documentVectors[d];
-                    var similarity = documentVector.Cosine(queryVector);
+                    var similarity = d.Vector.Times(this.inverseDocumentFrequencies).Cosine(queryVector);
                     return (d, similarity);
                 })
-                .OrderByDescending(x => x.similarity);
-        }
-
-        private IEnumerable<double> ToVector(IReadOnlyDictionary<string, double> termFrequencies)
-        {
-            return this.inverseDocumentFrequencies.Select(idf => termFrequencies.GetValueOrDefault(idf.Key) * idf.Value);
+                .OrderByDescending(x => x.similarity)
+                .ToList();
+            return new SearchResult(preparedQuery, results);
         }
     }
 }
