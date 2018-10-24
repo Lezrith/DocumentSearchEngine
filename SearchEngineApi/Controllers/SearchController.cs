@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WebInterface.Controllers
+namespace SearchEngineApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
