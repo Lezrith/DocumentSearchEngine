@@ -40,10 +40,10 @@ body {
     margin-top: 20px;
 }
 
-.relevant {
-
+.relevant-label {
+    color: darkgreen;
 }
 
-.irrelevant {
-    margin-left: 5px;
+.irrelevant-label {
+    color: orangered;
 }

@@ -3,8 +3,21 @@
 
 // Write your Javascript code.
 
+const apiBase = 'https://localhost:44384/api';
+
 function fetchSearchResults(query, page, perPage) {
-    $.ajax(`https://localhost:44384/api/search?query=${query}&page=${page}&perPage=${perPage}`)
+    $.ajax(`${apiBase}/search?query=${query}&page=${page}&perPage=${perPage}`)
+        .done(res => {
+            $('#search-with-feedback-button').prop('disabled', false);
+            showResults(res);
+        })
+        .fail(err => {
+            console.log(err);
+        });
+}
+
+function fetchSearchWithFeedbackResults(query, positive, negative, page, perPage) {
+    $.ajax(`${apiBase}/feedbackSearch?query=${query}&page=${page}&perPage=${perPage}&positive=${positive}&negative=${negative}`)
         .done(res => {
             showResults(res);
         })
@@ -23,8 +36,8 @@ function showResults(res) {
         const title = `${i + 1}. ${document.rawContents.split('\n')[0]} sim: ${similarity.toFixed(2)}`;
         const body = document.rawContents.split('\n').slice(1).join();
         const radios = $('<div>')
-            .append($('<label>').append($('<input>', { type: 'radio', name: `feedback${document.hash}`, value: document.hash, class: 'relevant' })).append('Relevant').addClass('radio-inline'))
-            .append($('<label>').append($('<input>', { type: 'radio', name: `feedback${document.hash}`, value: document.hash, class: 'irrelevant' })).append('Irrelevant').addClass('radio-inline'));
+            .append($('<label>').addClass('relevant-label').append($('<input>', { type: 'radio', name: `feedback${document.hash}`, value: document.hash, class: 'relevant' })).append('Relevant').addClass('radio-inline'))
+            .append($('<label>').addClass('irrelevant-label').append($('<input>', { type: 'radio', name: `feedback${document.hash}`, value: document.hash, class: 'irrelevant' })).append('Irrelevant').addClass('radio-inline'));
 
         const item = $('<li>').addClass('list-group-item')
             .append($('<h3>').addClass('list-group-item-heading').text(title))
@@ -38,9 +51,19 @@ function search(query) {
     fetchSearchResults(query, 1, 10);
 }
 
+function searchWithFeedback(query, positive, negative) {
+    fetchSearchWithFeedbackResults(query, positive, negative, 1, 10);
+}
+
 $(() => {
     $('#search-button').click(() => {
         const query = $('#query-input').val();
         search(query);
+    });
+    $('#search-with-feedback-button').click(() => {
+        const query = $('#query-input').val();
+        const positive = $.map($('input.relevant:checked'), i => i.value).join(',') || '';
+        const negative = $.map($('input.irrelevant:checked'), i => i.value).join(',') || '';
+        searchWithFeedback(query, positive, negative);
     });
 });
