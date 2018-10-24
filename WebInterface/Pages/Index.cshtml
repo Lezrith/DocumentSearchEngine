@@ -1,0 +1,26 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h2>Welcome to this awesome search engine. What documents are you looking for?</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for..." id="query-input"/>
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" id="search-button">Go!</button>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <ul class="list-group" id="result-list">
+       
+    </ul>
+</div>

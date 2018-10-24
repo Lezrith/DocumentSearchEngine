@@ -18,7 +18,7 @@ namespace SearchEngineApi.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(SearchResult))]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public ActionResult<IEnumerable<string>> Get([FromQuery] string query, [FromQuery] int page = 1, [FromQuery] int perPage = 10)
         {
@@ -34,7 +34,7 @@ namespace SearchEngineApi.Controllers
             {
                 var result = this.searchEngine.Search(query);
                 var start = (page - 1) * perPage;
-                return Ok(result.Results.Skip(start).Take(perPage));
+                return Ok(new { result.Query, Results = result.Results.Skip(start).Take(perPage) });
             }
             catch (ArgumentException)
             {

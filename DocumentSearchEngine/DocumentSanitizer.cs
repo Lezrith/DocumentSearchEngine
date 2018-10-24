@@ -11,7 +11,8 @@ namespace DocumentSearchEngine
     {
         public Document PrepareDocument(string contents, IReadOnlyCollection<string> keywords)
         {
-            var cleaned = RemoveSpecialCharacters(contents);
+            var singleLine = contents.Replace("\r", "").Replace("\n", " ");
+            var cleaned = RemoveSpecialCharacters(singleLine);
             var lower = cleaned.ToLower();
             var splitted = lower.Split();
             var stemmer = new PorterStemmer();
@@ -37,7 +38,6 @@ namespace DocumentSearchEngine
         private string RemoveSpecialCharacters(string contents)
         {
             var sb = new StringBuilder();
-            contents = contents.Replace("\r", "").Replace("\n", " ");
             foreach (char c in contents)
             {
                 if (Char.IsLetterOrDigit(c) || Char.IsWhiteSpace(c))

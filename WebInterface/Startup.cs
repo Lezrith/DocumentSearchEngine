@@ -1,11 +1,16 @@
-﻿using DocumentSearchEngine;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SearchEngineApi
+namespace WebInterface
 {
     public class Startup
     {
@@ -19,21 +24,15 @@ namespace SearchEngineApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddSingleton<ISearchEngine, SearchEngine>(_ => this.CreateSearchEngine());
-        }
-
-        private SearchEngine CreateSearchEngine()
-        {
-            var keywords = this.Configuration["keywords.txt"].Replace("\r", "").Split("\n");
-            var documents = this.Configuration["documents.txt"].Replace("\r", "").Split("\n\n");
-
-            var searchEngine = new SearchEngine(keywords, new DocumentSanitizer());
-            foreach (var rawDocument in documents)
+            services.Configure<CookiePolicyOptions>(options =>
             {
-                searchEngine.AddDocument(rawDocument);
-            }
-            return searchEngine;
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,14 +41,17 @@ namespace SearchEngineApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseCors(builder => builder.WithOrigins("https://localhost:44318").AllowAnyMethod().AllowAnyHeader());
             }
             else
             {
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
+
             app.UseMvc();
         }
     }
