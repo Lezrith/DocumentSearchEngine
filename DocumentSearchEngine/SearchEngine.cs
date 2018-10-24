@@ -11,6 +11,7 @@ namespace DocumentSearchEngine
         private readonly IDocumentSanitizer sanitizer;
         private readonly PorterStemmer stemmer;
         private readonly ICollection<double> inverseDocumentFrequencies;
+        private readonly IFeedbackCalculator feedbackCalculator;
 
         public SearchEngine(string[] keywords, IDocumentSanitizer sanitizer)
         {
@@ -19,6 +20,7 @@ namespace DocumentSearchEngine
             this.documents = new List<Document>();
             this.keywords = new HashSet<string>();
             this.inverseDocumentFrequencies = new List<double>();
+            this.feedbackCalculator = new RocchioFeedbackCalculator();
             foreach (var keyword in keywords)
             {
                 var stemmed = this.stemmer.StemWord(keyword);
@@ -59,15 +61,36 @@ namespace DocumentSearchEngine
             {
                 throw new ArgumentException("Query does not contain any known keywords");
             }
-            var queryVector = preparedQuery.Vector.Times(this.inverseDocumentFrequencies);
+            return this.Search(preparedQuery);
+        }
+
+        public SearchResult SearchWithFeedback(
+            string query,
+            IReadOnlyCollection<string> positiveFeedback,
+            IReadOnlyCollection<string> negativeFeedback)
+        {
+            var preparedQuery = this.sanitizer.PrepareDocument(query, this.keywords);
+            if (preparedQuery.Length == 0)
+            {
+                throw new ArgumentException("Query does not contain any known keywords");
+            }
+            var releventDocuments = this.documents.Where(d => positiveFeedback.Contains(d.Hash));
+            var irreleventDocuments = this.documents.Where(d => negativeFeedback.Contains(d.Hash));
+            var queryWithFeedback = this.feedbackCalculator.CalculateFeedback(preparedQuery, releventDocuments, irreleventDocuments);
+            return this.Search(queryWithFeedback);
+        }
+
+        private SearchResult Search(Document query)
+        {
+            var queryVector = query.Vector.Times(this.inverseDocumentFrequencies);
             var results = this.documents.Select(d =>
-                {
-                    var similarity = d.Vector.Times(this.inverseDocumentFrequencies).Cosine(queryVector);
-                    return (d, similarity);
-                })
+            {
+                var similarity = d.Vector.Times(this.inverseDocumentFrequencies).Cosine(queryVector);
+                return (d, similarity);
+            })
                 .OrderByDescending(x => x.similarity)
                 .ToList();
-            return new SearchResult(preparedQuery, results);
+            return new SearchResult(query, results);
         }
     }
 }

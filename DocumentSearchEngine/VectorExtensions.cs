@@ -25,5 +25,15 @@ namespace DocumentSearchEngine
         {
             return xs.Zip(ys, (x, y) => x * y);
         }
+
+        public static IEnumerable<double> Times(this IEnumerable<double> xs, double y)
+        {
+            return xs.Select(x => x * y);
+        }
+
+        public static IEnumerable<double> Add(this IEnumerable<double> xs, IEnumerable<double> ys)
+        {
+            return xs.Zip(ys, (x, y) => x + y);
+        }
     }
 }

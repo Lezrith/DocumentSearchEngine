@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Data.HashFunction.xxHash;
+using System.Text;
 
 namespace DocumentSearchEngine
 {
@@ -12,7 +14,11 @@ namespace DocumentSearchEngine
             this.RawContents = rawContents;
             this.contents = contents;
             this.vector = vector;
+            var hashFunction = xxHashFactory.Instance.Create();
+            this.Hash = hashFunction.ComputeHash(Encoding.UTF8.GetBytes(rawContents)).AsBase64String();
         }
+
+        public string Hash { get; }
 
         public IEnumerable<string> Contents => this.contents;
 
