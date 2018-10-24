@@ -16,12 +16,12 @@ namespace DocumentSearchEngine
         {
             var releventVector = releventDocuments
                 .Aggregate(
-                    (IEnumerable<double>)new List<double>(document.Vector.Count()),
+                    document.Vector.Select(_ => .0),
                     (v, d) => v.Add(d.Vector))
                 .ToList();
             var irrelevantVector = irrelevantDocuments
                 .Aggregate(
-                    (IEnumerable<double>)new List<double>(document.Vector.Count()),
+                    document.Vector.Select(_ => .0),
                     (v, d) => v.Add(d.Vector))
                 .ToList();
             var vectorWithFeedback = document.Vector
