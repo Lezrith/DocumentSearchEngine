@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DocumentSearchEngine
 {
-    public class SearchEngine
+    public class SearchEngine : ISearchEngine
     {
         private readonly List<Document> documents;
         private readonly HashSet<string> keywords;

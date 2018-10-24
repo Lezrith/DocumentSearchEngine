@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentSearchEngine", "DocumentSearchEngine\DocumentSearchEngine.csproj", "{F14655E4-F63F-413D-B1FE-AA0F4E9A406B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleInterface", "ConsoleInterface\ConsoleInterface.csproj", "{6AE8A7F6-69D6-4237-B002-371CF21B51A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleInterface", "ConsoleInterface\ConsoleInterface.csproj", "{6AE8A7F6-69D6-4237-B002-371CF21B51A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebInterface", "WebInterface\WebInterface.csproj", "{26F24A16-C215-477A-80B7-BAEC4C5731D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{6AE8A7F6-69D6-4237-B002-371CF21B51A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AE8A7F6-69D6-4237-B002-371CF21B51A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AE8A7F6-69D6-4237-B002-371CF21B51A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26F24A16-C215-477A-80B7-BAEC4C5731D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26F24A16-C215-477A-80B7-BAEC4C5731D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26F24A16-C215-477A-80B7-BAEC4C5731D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26F24A16-C215-477A-80B7-BAEC4C5731D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
