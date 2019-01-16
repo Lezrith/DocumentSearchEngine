@@ -12,6 +12,7 @@ namespace DocumentSearchEngine
         private readonly PorterStemmer stemmer;
         private readonly ICollection<double> inverseDocumentFrequencies;
         private readonly IFeedbackCalculator feedbackCalculator;
+        private readonly IClusteringStrategy clusteringStrategy;
 
         public SearchEngine(string[] keywords, IDocumentSanitizer sanitizer)
         {
@@ -26,6 +27,7 @@ namespace DocumentSearchEngine
                 var stemmed = this.stemmer.StemWord(keyword);
                 this.keywords.Add(stemmed);
             }
+            this.clusteringStrategy = new KMeansClustering(9, 100, new Random());
         }
 
         public void AddDocument(string rawContent)
@@ -80,14 +82,20 @@ namespace DocumentSearchEngine
             return this.Search(queryWithFeedback);
         }
 
+        public IDictionary<string, List<Document>> Cluster()
+        {
+            return this.clusteringStrategy.Cluster(this.documents, this.inverseDocumentFrequencies.ToList());
+        }
+
         private SearchResult Search(Document query)
         {
             var queryVector = query.Vector.Times(this.inverseDocumentFrequencies);
-            var results = this.documents.Select(d =>
-            {
-                var similarity = d.Vector.Times(this.inverseDocumentFrequencies).Cosine(queryVector);
-                return (d, similarity);
-            })
+            var results = this.documents
+                .Select(d =>
+                {
+                    var similarity = d.Vector.Times(this.inverseDocumentFrequencies).Cosine(queryVector);
+                    return (d, similarity);
+                })
                 .OrderByDescending(x => x.similarity)
                 .ToList();
             return new SearchResult(query, results);

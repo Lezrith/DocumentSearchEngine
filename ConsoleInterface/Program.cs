@@ -11,6 +11,7 @@ namespace ConsoleInterface
             app.HelpOption("-?|-h|--help");
 
             app.Command("search", SearchCommand.Configure);
+            app.Command("group", GroupCommand.Configure);
 
             return app.Execute(args);
         }

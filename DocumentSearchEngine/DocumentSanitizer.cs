@@ -9,7 +9,7 @@ namespace DocumentSearchEngine
 {
     public class DocumentSanitizer : IDocumentSanitizer
     {
-        public Document PrepareDocument(string contents, IReadOnlyCollection<string> keywords)
+        public virtual Document PrepareDocument(string contents, IReadOnlyCollection<string> keywords)
         {
             var singleLine = contents.Replace("\r", "").Replace("\n", " ");
             var cleaned = RemoveSpecialCharacters(singleLine);

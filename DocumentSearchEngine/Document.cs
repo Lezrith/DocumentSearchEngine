@@ -18,6 +18,11 @@ namespace DocumentSearchEngine
             this.Hash = hashFunction.ComputeHash(Encoding.UTF8.GetBytes(rawContents)).AsBase64String();
         }
 
+        internal Document(string group, string rawContests, string[] contents, double[] vector) : this(rawContests, contents, vector)
+        {
+            this.Group = group;
+        }
+
         public string Hash { get; }
 
         public IEnumerable<string> Contents => this.contents;
@@ -27,5 +32,7 @@ namespace DocumentSearchEngine
         public int Length => this.contents.Length;
 
         public string RawContents { get; }
+
+        public string Group { get; }
     }
 }
