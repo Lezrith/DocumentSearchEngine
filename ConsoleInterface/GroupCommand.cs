@@ -39,14 +39,15 @@ namespace ConsoleInterface
             try
             {
                 var groups = searchEngine.Cluster();
-                Console.WriteLine("Group1                     Group2");
+                Console.WriteLine("Assigned group                  Original group");
                 Console.WriteLine(new String('-', 50));
                 foreach (var group in groups)
                 {
                     foreach (var document in group.Value)
                     {
-                        Console.WriteLine($"{group.Key, -25}  {document.Group}");
+                        Console.WriteLine($"{group.Key, -30}  {document.Group}");
                     }
+                    Console.WriteLine();
                 }
             }
             catch (Exception ex)
