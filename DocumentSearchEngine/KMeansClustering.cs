@@ -25,11 +25,9 @@ namespace DocumentSearchEngine
             var seedDocuments = documents
                 .OrderBy(_ => this.rng.NextDouble())
                 .Take(this.k);
-            var seed = new Dictionary<string, List<double>>();
-            foreach (var document in seedDocuments)
-            {
-                seed[document.Group] = document.Vector.Times(inverseDocumentFrequencies).ToList();
-            }
+            var seed = seedDocuments
+                .Zip(Enumerable.Range(1, this.k), (d, i) => (document: d, index: i))
+                .ToDictionary(x => $"group{x.index}", x => x.document.Vector.Times(inverseDocumentFrequencies).ToList());
             var groups = new Dictionary<string, List<Document>>();
             for (int i = 0; i < this.iterations; i++)
             {
